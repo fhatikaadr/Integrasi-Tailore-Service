@@ -10,6 +10,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 console.log('🔧 Tailore Integration Service Starting...'); 
 
 const CATALOG_URL = 'https://ooga.queenifyofficial.site/api';

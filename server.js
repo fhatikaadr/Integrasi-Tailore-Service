@@ -67,42 +67,32 @@ app.post('/api/checkout', async (req, res) => {
         }
 
         currentStep = 'CREATE_ORDER';
-        console.log('\n💾 STEP 2: Creating single order with all items...');
-        
-        // Calculate grand total
-        const grandTotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
-        
-        // Format items untuk order
-        const orderItems = items.map(item => ({
-            product_id: item.productId,
-            product_name: item.productName,
-            quantity: parseInt(item.quantity),
-            price: item.price,
-            total_price: item.totalPrice
-        }));
-        
-        const orderData = {
-            customer_name: customerName,
-            items: orderItems,
-            total_price: grandTotal
-        };
-        
-        console.log(`  - Creating order with ${items.length} items:`, JSON.stringify(orderData, null, 2));
-        
-        const orderRes = await axios.post(
-            `${ORDER_URL}/orders`,
-            orderData,
-            { headers: { 'x-secret-key': 'rahasia123' } }
-        );
-        
-        console.log(`  - Order response:`, JSON.stringify(orderRes.data, null, 2));
-        
-        const orderId = orderRes.data.order_id || orderRes.data.data?.id || orderRes.data.id;
-        if (orderId) {
-            createdOrderIds.push(orderId);
-            console.log(`  ✅ Single order created with ID: ${orderId} for all ${items.length} items`);
-        } else {
-            console.log(`  ⚠️ Order created but no ID returned:`, orderRes.data);
+        console.log('\n💾 STEP 2: Creating orders in Cimol...');
+        for (const item of items) {
+            const orderData = {
+                customer_name: customerName,
+                product_id: item.productId,
+                quantity: parseInt(item.quantity),
+                total_price: item.totalPrice
+            };
+            
+            console.log(`  - Creating order:`, JSON.stringify(orderData, null, 2));
+            
+            const orderRes = await axios.post(
+                `${ORDER_URL}/orders`,
+                orderData,
+                { headers: { 'x-secret-key': 'rahasia123' } }
+            );
+            
+            console.log(`  - Order response:`, JSON.stringify(orderRes.data, null, 2));
+            
+            const orderId = orderRes.data.order_id || orderRes.data.data?.id || orderRes.data.id;
+            if (orderId) {
+                createdOrderIds.push(orderId);
+                console.log(`  ✅ Order created with ID: ${orderId}`);
+            } else {
+                console.log(`  ⚠️ Order created but no ID returned:`, orderRes.data);
+            }
         }
 
         currentStep = 'COMMIT_STOCK';

@@ -12,8 +12,6 @@ app.use(express.static('public'));
 
 console.log('🔧 Tailore Integration Service Starting...'); 
 
-
-// URL WEBSITE YANG SUDAH ONLINE
 const CATALOG_URL = 'https://ooga.queenifyofficial.site/api';
 const ORDER_URL = 'https://cimol.queenifyofficial.site/api';
 
@@ -21,7 +19,6 @@ console.log('📡 Connected APIs:');
 console.log('   - Catalog API:', CATALOG_URL);
 console.log('   - Order API:', ORDER_URL);
 
-// --- API CHECKOUT (Jembatan ke Ooga & Cimol) ---
 app.post('/api/checkout', async (req, res) => {
     const { items, customerName } = req.body;
     const userToken = req.headers.authorization; 
@@ -32,7 +29,6 @@ app.post('/api/checkout', async (req, res) => {
     console.log('Items:', JSON.stringify(items, null, 2));
     console.log('Token:', userToken ? 'Present' : 'Missing');
 
-    // Cek Token Login dari Ooga
     if (!userToken) {
         console.log('❌ No token provided');
         return res.status(401).json({ success: false, message: "Harap login dulu!" });
@@ -48,7 +44,6 @@ app.post('/api/checkout', async (req, res) => {
     try {
         console.log(`\n📦 Processing ${items.length} items for: ${customerName}`);
 
-        // STEP 1: Loop ke Ooga (Kunci Stok)
         currentStep = 'RESERVE_STOCK';
         console.log('\n🔒 STEP 1: Reserving stock...');
         for (const item of items) {
@@ -67,7 +62,6 @@ app.post('/api/checkout', async (req, res) => {
             console.log(`  ✅ Stock reserved for product ${item.productId}`);
         }
 
-        // STEP 2: Loop ke Cimol (Simpan Order)
         currentStep = 'CREATE_ORDER';
         console.log('\n💾 STEP 2: Creating orders in Cimol...');
         for (const item of items) {
@@ -97,7 +91,6 @@ app.post('/api/checkout', async (req, res) => {
             }
         }
 
-        // STEP 3: Loop ke Ooga (Commit Stok/Finalisasi)
         currentStep = 'COMMIT_STOCK';
         console.log('\n✅ STEP 3: Committing stock...');
         for (const item of items) {
@@ -126,10 +119,7 @@ app.post('/api/checkout', async (req, res) => {
         console.error('Error status:', error.response?.status);
         console.error('Full error:', error);
         
-        // Rollback jika ada error (release reserved stock)
-        // Note: Implementasi rollback bisa ditambahkan di sini jika diperlukan
-        
-        res.status(500).json({
+        res.status(500).json({}
             success: false,
             message: "Transaksi Gagal. Silakan coba lagi.",
             error: error.response?.data?.message || error.message
@@ -137,26 +127,17 @@ app.post('/api/checkout', async (req, res) => {
     }
 });
 
-// --- API GET ORDERS BY CUSTOMER (Proxy to Cimol with filter) ---
 app.get('/api/orders/:customerName', async (req, res) => {
     const { customerName } = req.params;
     
     try {
-        console.log(`📋 Fetching orders for: ${customerName}`);
-        
-        // Get all orders from Cimol
         const ordersRes = await axios.get(`${ORDER_URL}/orders`, {
             headers: { 'x-secret-key': 'rahasia123' }
         });
         
-        console.log(`📦 Total orders from Cimol: ${ordersRes.data.data?.length || 0}`);
-        
-        // Filter orders by customer name
         const filteredOrders = ordersRes.data.data?.filter(order => 
             order.customer_name === customerName
         ) || [];
-        
-        console.log(`✅ Filtered orders for ${customerName}: ${filteredOrders.length}`);
         
         res.status(200).json({
             success: true,

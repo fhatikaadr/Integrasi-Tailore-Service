@@ -2214,19 +2214,45 @@
         // Product name cache to avoid fetching same product multiple times
         const productNameCache = {};
         
+        const dummyProductNames = {
+            101: "Basic Black Tee",
+            102: "Oversized Hoodie",
+            103: "Crop Top Pink",
+            104: "Leather Jacket"
+        };
+        
         async function getProductName(productId) {
             if (productNameCache[productId]) {
                 return productNameCache[productId];
             }
             
+            if (dummyProductNames[productId]) {
+                productNameCache[productId] = dummyProductNames[productId];
+                return dummyProductNames[productId];
+            }
+            
             try {
-                const res = await fetch(`${CATALOG_API}/catalog/products/${productId}`);
+                const headers = {};
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const res = await fetch(`${CATALOG_API}/catalog/products/${productId}`, { headers });
+                
+                if (!res.ok) {
+                    console.warn(`Failed to fetch product ${productId}:`, res.status);
+                    productNameCache[productId] = `Product #${productId}`;
+                    return `Product #${productId}`;
+                }
+                
                 const data = await res.json();
-                const name = data.data?.name || 'Unknown Product';
+                const name = data.data?.name || `Product #${productId}`;
                 productNameCache[productId] = name;
                 return name;
             } catch(e) {
-                return 'Unknown Product';
+                console.warn(`Error fetching product ${productId}:`, e.message);
+                productNameCache[productId] = `Product #${productId}`;
+                return `Product #${productId}`;
             }
         }
 

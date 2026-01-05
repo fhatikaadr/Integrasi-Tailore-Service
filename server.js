@@ -119,7 +119,7 @@ app.post('/api/checkout', async (req, res) => {
         console.error('Error status:', error.response?.status);
         console.error('Full error:', error);
         
-        res.status(500).json({}
+        res.status(500).json({
             success: false,
             message: "Transaksi Gagal. Silakan coba lagi.",
             error: error.response?.data?.message || error.message

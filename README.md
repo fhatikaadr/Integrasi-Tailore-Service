@@ -42,7 +42,7 @@ Service ini berfungsi sebagai **frontend integration layer** yang:
        ▼
 ┌─────────────────────────┐
 │  Tailoré Frontend       │ ◄─── Integration Service
-│  (SPA - Port 3000)      │
+│  (SPA - Port 5000)      │
 └───┬─────────────┬───────┘
     │             │
     │ JWT         │ JWT + Secret
@@ -104,11 +104,43 @@ npm install
 npm start
 ```
 
-Service berjalan di **http://localhost:3000**
+Service berjalan di **http://localhost:5000**
 
 ---
 
 ## 📡 API Endpoints
+
+### Integration Service (Tailoré)
+**Base URL**: `http://localhost:5000`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/checkout` | Process checkout with 2PC |
+| GET | `/api/orders/:customerName` | Get orders by customer |
+
+**Checkout Request**:
+```json
+{
+  "items": [
+    {
+      "productId": "xxx",
+      "quantity": 2
+    }
+  ],
+  "customerName": "John Doe"
+}
+```
+
+**Headers**: `Authorization: Bearer <token>`
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Transaksi Berhasil!",
+  "invoices": ["#ORD-123", "#ORD-124"]
+}
+```
 
 ### Catalog Service (Ooga)
 **Base URL**: `https://ooga.queenifyofficial.site/api`
@@ -211,10 +243,10 @@ Integrasi-Tailore-Service/
 ## 🛠️ Development
 
 ### Port Configuration
-Default: **3000**  
+Default: **5000**  
 Change via environment:
 ```bash
-PORT=5000 npm start
+PORT=3000 npm start
 ```
 
 ### Tech Stack

@@ -223,12 +223,18 @@ try {
 
 ```
 Integrasi-Tailore-Service/
-├── server.js           # Express server
-├── package.json        # Dependencies
-├── vercel.json         # Deployment config
-├── README.md           # Documentation
-└── public/
-    └── index.html      # Frontend SPA
+├── public/
+│   └── index.html              # Frontend SPA
+├── .dockerignore               # Docker ignore file
+├── .env.example                # Environment variables template
+├── .gitignore                  # Git ignore file
+├── DOCKER-DEPLOYMENT.md        # Docker deployment guide
+├── Dockerfile                  # Docker configuration
+├── README.md                   # Main documentation
+├── package-lock.json           # Dependencies lock file
+├── package.json                # Project dependencies
+├── pull-and-run.sh             # Auto deployment script
+└── server.js                   # Express backend server
 ```
 
 ---

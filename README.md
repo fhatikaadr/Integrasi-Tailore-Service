@@ -1,20 +1,19 @@
-# Tailoré Integration Service
+# 👗 Tailoré Integration Service
 
-Layanan integrasi untuk e-commerce rental fashion yang mengintegrasikan **Catalog Service (Ooga)** dan **Order Service (Cimol)**.
+![Tailoré Banner](https://img.shields.io/badge/Status-Live-success?style=for-the-badge&logo=vercel)
+![Tech](https://img.shields.io/badge/Tech-Node.js%20|%20Express%20|%20VanillaJS-blue?style=for-the-badge)
 
-[Tailoré Web](https://tailore-service.vercel.app/)
+**Tailoré Integration Service** adalah solusi *frontend integration layer* yang dirancang untuk mengorkestrasi ekosistem e-commerce rental fashion. Layanan ini menghubungkan **Catalog Service (Ooga)** dan **Order Service (Cimol)** menjadi satu pengalaman pengguna yang kohesif.
+
+[**🌐 Kunjungi Tailoré Web**](http://tailore-tika.queenifyofficial.site/)
 
 ---
 
-## 📋 Deskripsi
+## 📋 Deskripsi Proyek
 
-Service ini berfungsi sebagai **frontend integration layer** yang:
-- Menyediakan UI untuk shopping experience yang lengkap
-- Mengkoordinasikan proses checkout dengan **2-Phase Commit**
-- Mengintegrasikan authentication antara kedua service
-- Menangani cart management di client-side
+Service ini bertindak sebagai pusat kendali (*orchestrator*) yang menjembatani komunikasi antar microservices. Fokus utamanya adalah menjaga integritas data selama proses pemesanan melalui mekanisme transaksi atomik.
 
-### Analisis Layanan Kelompok (Point A)
+### Analisis Layanan Kelompok
 
 **Catalog Service (Ooga)**:
 - ✅ JWT auth & role-based access
@@ -27,8 +26,6 @@ Service ini berfungsi sebagai **frontend integration layer** yang:
 - ✅ Transaction history (user & admin)
 - ✅ Secret key authentication
 - ⚠️ Butuh order status update & notifications
-
-**Tanggapan**: Kedua service sudah bagus dengan clear separation of concerns. Rekomendasi: standardize error format & add API gateway.
 
 ---
 
@@ -53,23 +50,22 @@ Service ini berfungsi sebagai **frontend integration layer** yang:
 └──────────┘  └──────────┘
 ```
 
-**Integration Strategy (Point B & C)**:
-1. **Auth**: Single sign-on via Catalog JWT
-2. **State**: Cart di localStorage, data di backend
-3. **Transaction**: 2PC (reserve → order → commit)
-4. **UI**: Unified experience untuk kedua service
+**Strategi Integrasi**:
+1.  **Unified Authentication**: Pengguna hanya perlu login satu kali menggunakan JWT dari Catalog Service yang kemudian diteruskan ke Order Service.
+2.  **State Management**: Sinkronisasi data antara `localStorage` (sisi klien) dengan database backend secara real-time.
+3.  **Atomic Transaction**: Menjamin bahwa stok tidak akan berkurang jika pembuatan invoice gagal, dan sebaliknya.
 
 ---
 
-## ✨ Fitur
+## ✨ Fitur Utama
 
-### Frontend Integration Layer (Layanan Baru - Point C)
-- ✅ Product catalog dengan search & filter
-- ✅ Shopping cart management (localStorage)
-- ✅ 2-Phase Commit checkout flow
-- ✅ Order history tracking
-- ✅ Admin dashboard (inventory & transactions)
-- ✅ Responsive design (cherry/green theme)
+- **🛒 Integrated Catalog**: Penjelajahan produk dengan fitur pencarian dan filter kategori.
+- **🛍️ Cart System**: Pengelolaan keranjang belanja yang persisten berbasis browser.
+- **🔐 2-Phase Commit Checkout**: Protokol transaksi aman (Reserve → Order → Commit).
+- **📊 Admin Dashboard**: Monitoring inventaris dan transaksi gabungan dari kedua service.
+- **📱 Responsive UI**: Antarmuka modern dengan tema warna *Cherry & Green* yang dioptimalkan untuk perangkat mobile.
+
+---
 
 ### Untuk User
 - Browse products dengan pagination
@@ -193,19 +189,16 @@ Login menggunakan Catalog Service, token digunakan untuk kedua service.
 
 ---
 
-## 🎯 Transaction Flow (2-Phase Commit)
+## 🎯 Alur Transaksi (2-Phase Commit)
 
-```
-1. User checkout
-   ↓
-2. Reserve stock (Catalog)
-   ↓
-3. Create order (Order Service)
-   ↓
-4. Commit reservation (Catalog)
-   ↓
-5. Success / Rollback if failed
-```
+Protokol ini sangat krusial untuk mencegah inkonsistensi data stok:
+
+1.  **Phase 1 (Prepare/Reserve)**: Melakukan pengecekan dan reservasi stok di **Catalog Service**.
+2.  **Phase 2 (Execute/Order)**: Jika stok tersedia, membuat entri transaksi di **Order Service**.
+3.  **Phase 3 (Commit)**: Finalisasi pengurangan stok secara permanen.
+4.  **Rollback**: Jika salah satu tahap di atas gagal, sistem secara otomatis membatalkan reservasi stok.
+
+---
 
 **Implementation**:
 ```javascript
@@ -277,28 +270,16 @@ PORT=3000 npm start
 
 ---
 
-## 🌐 Deployment (Point D)
+## 🌐 Deployment
 
-**Live URL**: [https://tailore-service.vercel.app](https://tailore-service.vercel.app)
-
-```bash
-# Deploy ke Vercel
-vercel --prod
-```
-
-**Source Code**: [GitHub Repository]  
-**Video Demo**: [YouTube Link - Coming Soon]
+**Live URL**: [http://tailore-tika.queenifyofficial.site/](http://tailore-tika.queenifyofficial.site/)
 
 ---
 
 ## 👥 Team
 
 **Tailoré E-Commerce Project**  
-Service-Oriented Architecture - 2026
-
-**Integration Service by**: Florecita Natawirya  
-**Catalog Service by**: [Nama Anggota 2]  
-**Order Service by**: [Nama Anggota 3]
+**Integration Service by**: Fhatika Adhalisman Ryanjani
 
 ---
 
@@ -310,10 +291,3 @@ Proyek ini berhasil mengintegrasikan Catalog & Order service dengan:
 - ✅ Client-side cart dengan localStorage
 - ✅ Responsive UI dengan modern design
 - ✅ Production deployment
-
-**Future Work**: WebSocket notifications, payment gateway, mobile app.
-
----
-
-**Last Updated**: January 7, 2026  
-**Version**: 1.0.0

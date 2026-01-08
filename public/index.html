@@ -2645,8 +2645,17 @@
             tbody.innerHTML = '<tr><td colspan="8" class="loading">LOADING</td></tr>';
             
             try {
-                const res = await fetch(`${ORDER_API}/orders`, {
-                    headers: { 'x-secret-key': 'rahasia123' }
+                // Check if user is admin
+                const isAdmin = userRole === 'admin' || (userData && userData.role === 'admin');
+                
+                // Admin gets all orders, regular user gets only their orders
+                const customerName = currentUser || (userData && userData.username);
+                const endpoint = isAdmin ? '/api/orders/all' : `/api/orders/${customerName}`;
+                
+                const res = await fetch(endpoint, {
+                    headers: { 
+                        'Authorization': token || authToken
+                    }
                 });
                 const data = await res.json();
                 

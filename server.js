@@ -16,8 +16,8 @@ app.get('/', (req, res) => {
 
 console.log('Tailore Integration Service Starting...'); 
 
-const CATALOG_URL = 'https://ooga.queenifyofficial.site/api';
-const ORDER_URL = 'https://cimol.queenifyofficial.site/api';
+const CATALOG_URL = process.env.CATALOG_URL || 'https://ooga.queenifyofficial.site/api';
+const ORDER_URL = process.env.ORDER_URL || 'https://cimol.queenifyofficial.site/api';
 
 console.log('Connected APIs:');
 console.log('   - Catalog API:', CATALOG_URL);
@@ -127,6 +127,27 @@ app.post('/api/checkout', async (req, res) => {
             success: false,
             message: "Transaksi gagal. Silakan coba lagi.",
             error: error.response?.data?.message || error.message
+        });
+    }
+});
+
+app.get('/api/orders/all', async (req, res) => {
+    try {
+        const ordersRes = await axios.get(`${ORDER_URL}/orders`, {
+            headers: { 'x-secret-key': 'rahasia123' }
+        });
+        
+        res.status(200).json({
+            success: true,
+            data: ordersRes.data.data || []
+        });
+        
+    } catch (error) {
+        console.error("Failed to fetch all orders:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Gagal mengambil semua data pesanan",
+            error: error.message
         });
     }
 });
